@@ -12,10 +12,6 @@ async function getHotelsAvailable(userId: number) {
   if (!ticket) {
     throw notFoundError();
   }
-
-  if (!ticket) {
-    throw notFoundError();
-  }
   if (!ticket.TicketType.isRemote) {
     throw notFoundError();
   }
@@ -29,5 +25,20 @@ async function getHotelsAvailable(userId: number) {
   return hotels;
 }
 
-const hotelService = { getHotelsAvailable };
+async function getHotelRooms(userId: number, hotelId: string) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) {
+    throw notFoundError();
+  }
+  const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
+  if (!ticket) {
+    throw notFoundError();
+  }
+  const hotelRoom = await hotelRepository.getHotelRooms(hotelId);
+  if (!hotelRoom) {
+    throw notFoundError();
+  }
+  return hotelRoom;
+}
+const hotelService = { getHotelsAvailable, getHotelRooms };
 export default hotelService;
