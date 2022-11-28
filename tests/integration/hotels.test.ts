@@ -13,7 +13,6 @@ import {
 } from "../factories";
 import { cleanDb, generateValidToken } from "../helpers";
 import { TicketStatus } from "@prisma/client";
-import { prisma } from "@/config";
 
 beforeAll(async () => {
   await init();
@@ -60,15 +59,19 @@ describe("GET /hotels", () => {
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.OK);
-      expect(response.body).toEqual({
-        id: hotel.id,
-        name: hotel.name,
-        image: hotel.image,
-        createdAt: hotel.createdAt.toISOString(),
-        updatedAt: hotel.updatedAt.toISOString(),
-      });
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          {
+            id: hotel.id,
+            name: hotel.name,
+            image: hotel.image,
+            createdAt: hotel.createdAt.toISOString(),
+            updatedAt: hotel.updatedAt.toISOString(),
+          },
+        ]),
+      );
     });
-
     it("should respond with status 404 if the user is not enrolled", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
